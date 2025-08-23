@@ -1,22 +1,44 @@
 {
   "name": "angular-electron",
   "version": "0.0.0",
+  "main": "main.js",
+  "description": "Projeto teste electron.",
+  "author": "Bruno Martins Jorge rexon300008@gmail.com",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "ng-build": "ng build",
+    "start": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && electron .\"",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "dist": "npm run ng-build -- --configuration=production && electron-builder"
   },
-  "prettier": {
-    "overrides": [
+  "build": {
+    "appId": "com.seu-projeto.id",
+    "productName": "Gerenciador de Formulários AMAS",
+    "files": [
+      "dist/Angular_Electron/**/*",
+      "main.js",
+      "package.json",
+      "node_modules/**/*",
+      "Auth/**/*",
+      "banco_dados.js",
+      "logo-amas.ico",
+      "*.db"
+    ],
+    "extraResources": [
       {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
+        "from": "client_secret.json",
+        "to": "client_secret.json"
       }
-    ]
+    ],
+    "icon": "logo-amas.ico",
+    "win": {
+      "target": [
+        {
+          "target": "nsis"
+        }
+      ]
+    }
   },
   "private": true,
   "dependencies": {
@@ -26,21 +48,38 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@google-cloud/local-auth": "^3.0.1",
+    "@primeuix/themes": "^1.2.3",
+    "better-sqlite3": "^12.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "googleapis": "^155.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "primeflex": "^4.0.0",
+    "primeicons": "^7.0.0",
+    "primeng": "^20.0.1",
     "rxjs": "~7.8.0",
+    "sqlite3": "^5.1.7",
     "tslib": "^2.3.0",
+    "url-minify": "^2.8.4",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
     "@angular/build": "^20.1.5",
     "@angular/cli": "^20.1.5",
     "@angular/compiler-cli": "^20.1.0",
+    "@types/express": "^5.0.3",
     "@types/jasmine": "~5.1.0",
+    "concurrently": "^9.2.0",
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "wait-on": "^8.0.4"
   }
 }

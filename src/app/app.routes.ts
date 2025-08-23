@@ -1,3 +1,52 @@
 import { Routes } from '@angular/router';
+import { ListarFormularios } from './pages/listar-formularios/listar-formularios';
+import { authGuardGuard } from './core/guards/auth-guard-guard';
+import { Autenticacao } from './pages/autenticacao/autenticacao';
+import { AdicionarFormulario } from './pages/adicionar-formulario/adicionar-formulario';
+import { VisualisarFormulario } from './pages/visualisar-formulario/visualisar-formulario';
+import { AdicionarQuiz } from './pages/adicionar-quiz/adicionar-quiz';
+import { ListarQuiz } from './pages/listar-quiz/listar-quiz';
+import { Autenticado } from './pages/autenticado/autenticado';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+    {
+        path: '',
+        component: Autenticacao,
+        title: 'Autenticação',
+    },
+    {
+        path: 'auth/callback',
+        component: Autenticado,
+        title: 'Autenticado',
+    },
+    {
+        path: 'listar-formularios',
+        component: ListarFormularios,
+        title: 'Listar Formulários',
+        canActivate: [authGuardGuard],
+    },
+    {
+        path: 'adicionar-formulario',
+        component: AdicionarFormulario,
+        title: 'Adicionar Formulário',
+        canActivate: [authGuardGuard],
+    },
+    {
+        path: 'listar-quiz',
+        component: ListarQuiz,
+        title: 'Listar Formulários',
+        canActivate: [authGuardGuard],
+    },
+    {
+        path: 'adicionar-quiz',
+        component: AdicionarQuiz,
+        title: 'Adicionar Formulário',
+        canActivate: [authGuardGuard],
+    },
+    {
+        path: 'ver-formulario/:id',
+        component: VisualisarFormulario,
+        title: 'Visualizar Formulário',
+        canActivate: [authGuardGuard],
+    }
+];

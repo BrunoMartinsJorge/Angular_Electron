@@ -1,0 +1,231 @@
+<section class="container">
+  <div class="info-header">
+    <h1>Adicionar Quiz</h1>
+    <span
+      >Crie um novo quiz com questões
+      personalizadas.</span
+    >
+  </div>
+  <div class="form-info">
+    <span
+      ><i class="pi pi-calendar"></i>Informações do Quiz
+    </span>
+    <div class="quests-form">
+      <div class="input-group">
+        <label for="titulo"
+          >Título do Quiz:</label
+        >
+        <input
+          id="titulo"
+          type="text"
+          pInputText
+          [(ngModel)]="quiz.titulo"
+          placeholder="Título do Quiz"
+        />
+      </div>
+      <div class="input-group">
+        <label for="descricao"
+          >Descrição do Quiz:</label
+        >
+        <textarea
+          id="descricao"
+          placeholder="Insira uma descrição para o quiz"
+          rows="1"
+          pTextarea
+          [(ngModel)]="quiz.descricao"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+  <h2>Questões do Quiz</h2>
+  <div
+    class="quest"
+    *ngFor="let questao of quiz.questoes; let i = index"
+  >
+    <div class="quest-header">
+      <h4>Questão {{ quiz.questoes.length }}</h4>
+    </div>
+    <hr />
+    <div class="input-group">
+      <label for="titulo-quest">Título da Questão:</label>
+      <input
+        id="titulo-quest"
+        type="text"
+        pInputText
+        [(ngModel)]="questao.titulo"
+        placeholder="Título da Questão"
+      />
+    </div>
+    <div class="opcao-quest">
+      <div class="input-group">
+        <label for="tipo-quest">Qual o tipo da questão:</label>
+        <p-select
+          id="tipo-quest"
+          [options]="tipoDeCampo"
+          [(ngModel)]="questao.tipo"
+          optionLabel="nome"
+          optionValue="value"
+          placeholder="Selecione o tipo de questão"
+          class="w-full md:w-56"
+        />
+      </div>
+      <p-button
+        *ngIf="questao.tipo === 'MULTIPLA' || questao.tipo === 'UNICA'"
+        label="Adicionar opção"
+        icon="pi pi-plus"
+        (click)="adicionarOpcao(i)"
+      />
+    </div>
+    <div class="info-input" *ngIf="questao.tipo === 'NUMERO'">
+      <div class="input-group">
+        <label for="min-quest">Valor mínimo:</label>
+        <p-input-number
+          id="min-quest"
+          type="number"
+          [(ngModel)]="questao.min"
+          placeholder="Mínimo"
+        />
+      </div>
+      <div class="input-group">
+        <label for="max-quest">Valor máximo:</label>
+        <p-input-number
+          id="max-quest"
+          type="number"
+          [(ngModel)]="questao.max"
+          placeholder="Máximo"
+        />
+      </div>
+    </div>
+    <div
+      class="inputs-list"
+      *ngIf="questao.tipo && (questao.tipo === 'UNICA' || questao.tipo === 'MULTIPLA' || questao.tipo === 'CHECKBOX')"
+    >
+      <p-inputgroup
+        pSize="small"
+        *ngFor="let opcao of questao.opcoes; let index = index; trackBy: trackByIndex"
+      >
+        <p-button
+          label="Apagar"
+          icon="pi pi-trash"
+          (click)="removerOpcao(i, index)"
+        />
+        <input
+          pInputText
+          placeholder="Opção..."
+          [(ngModel)]="questao.opcoes![index]"
+        />
+        <p-inputgroup-addon>
+          <p-button [icon]="opcaoCorreta(i, index) ? 'pi pi-check' : 'pi pi-times'" (click)="toggleOpcaoCorreta(i, index)"/>
+        </p-inputgroup-addon>
+      </p-inputgroup>
+    </div>
+
+    <div class="info-input" *ngIf="questao.tipo === 'ESCALA'">
+      <div class="input-group">
+        <label for="min-quest">Valor mínimo:</label>
+        <p-input-number
+          id="min-quest"
+          type="number"
+          [min]="0"
+          [max]="questao.high ? questao.high : 2"
+          [(ngModel)]="questao.low"
+          placeholder="Valor mínimo"
+        />
+      </div>
+      <div class="input-group">
+        <label for="max-quest">Valor máximo:</label>
+        <p-input-number
+          id="max-quest"
+          type="number"
+          [min]="questao.low ? questao.low : 1"
+          [(ngModel)]="questao.high"
+          placeholder="Valor máximo"
+        />
+      </div>
+      <!-- <input [(ngModel)]="questao.startLabel" placeholder="Label início" />
+      <input [(ngModel)]="questao.endLabel" placeholder="Label fim" /> -->
+    </div>
+
+    <div *ngIf="questao.tipo === 'UPLOAD'">
+      <input
+        type="number"
+        [(ngModel)]="questao.maxFiles"
+        placeholder="Máx. arquivos"
+      />
+      <input
+        type="number"
+        [(ngModel)]="questao.maxFileSize"
+        placeholder="Tamanho máximo (MB)"
+      />
+      <input
+        [(ngModel)]="questao.allowedMimeTypes"
+        placeholder="Tipos permitidos, separados por vírgula"
+      />
+    </div>
+    <div class="input-group">
+      <label for="descricao-quest">Questão Obrigatória?</label>
+      <p-toggleswitch [(ngModel)]="questao.obrigatoria" />
+    </div>
+    <p-fieldset
+      legend="Vizualizar questão"
+      toggleable="true"
+      [collapsed]="true"
+      to
+    >
+      <app-visualizar-questao [questao]="questao"></app-visualizar-questao>
+    </p-fieldset>
+    <hr />
+    <div class="footer-quest">
+      <p-button
+        [label]="questao.favorito ? 'Desfavoritar' : 'Favoritar'"
+        icon="pi pi-star"
+        [severity]="questao.favorito ? 'danger' : 'info'"
+        (click)="favoritarQuestao(i)"
+      />
+      <p-button
+        label="Remover Questão"
+        icon="pi pi-trash"
+        severity="danger"
+        (click)="removerQuestao(i)"
+      />
+    </div>
+  </div>
+  <div class="quest-empty" *ngIf="quiz.questoes.length === 0">
+    <span>Nenhuma questão adicionada ainda.</span>
+  </div>
+</section>
+<footer>
+  <p-button
+    label="Criar Quiz"
+    (click)="criarQuiz()"
+    [disabled]="!quizIsValid()"
+    icon="pi pi-check"
+  ></p-button>
+  <p-button
+    label="Adicionar Questão"
+    (click)="adicionarQuestaoQuiz()"
+    class="ml-2"
+    icon="pi pi-plus"
+  ></p-button>
+</footer>
+<section *ngIf="mostrarTelaAcao" class="tela-acao erro">
+  <h2>Erro ao criar formulário</h2>
+  <span> Aparentemente ocorreu um erro ao criar o formulário </span>
+</section>
+<section *ngIf="carregando" class="tela-acao carregando">
+  <h2>Carregando...</h2>
+  <span> Por favor, aguarde enquanto o formulário é criado </span>
+  <p-progressSpinner></p-progressSpinner>
+</section>
+<p-dialog
+  [style]="{ width: '50%' }"
+  [(visible)]="visibilidadeDialog"
+  header="Formulário criado com sucesso!"
+  [modal]="true"
+>
+  <p>O formulário foi criado com sucesso!</p>
+  <span id="urlForm">
+    <i class="pi pi-share-alt"></i>
+    <a href="{{ urlForm }}" target="_blank">{{urlForm}}</a>
+  </span>
+</p-dialog>

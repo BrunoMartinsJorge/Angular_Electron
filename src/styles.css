@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+@import "primeicons/primeicons.css";
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100%;
+  background-color: var(--branco-claro);
+  overflow-x: hidden;
+}
+
+:root {
+  --vermelho-vivo: #d72631;
+  --preto-profundo: #1c1c1c;
+  --branco-claro: #ffffff;
+  --vermelho-claro: #ef5350;
+  --cinza-medio: #757575;
+}

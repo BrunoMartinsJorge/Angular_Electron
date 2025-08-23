@@ -1,0 +1,67 @@
+<ng-container [ngSwitch]="questao?.tipo">
+  <ng-container *ngSwitchCase="'TEXTO'">
+    <div class="questao-element">
+      <div class="questao-body">
+        <h4>{{ questao?.titulo != '' ? questao?.titulo : 'Sem título' }}</h4>
+        <input
+          type="text"
+          pInputText
+          placeholder="Resposta..."
+          [(ngModel)]="resposta"
+          [invalid]="disabled"
+        />
+        <br />
+      </div>
+      <p-button label="Enviar" icon="pi pi-send" (click)="simularResposta()" />
+    </div>
+    <span [ngClass]="'mensagem-resposta ' + (disabled ? 'disabled' : '')"
+      >{{ mensagemResposta }}</span
+    >
+  </ng-container>
+  <ng-container *ngSwitchCase="'NUMERO'">
+    <div class="questao-element">
+      <div class="questao-body">
+        <h4>{{ questao?.titulo != '' ? questao?.titulo : 'Sem título' }}</h4>
+        <p-input-number
+          placeholder="Resposta..."
+          [(ngModel)]="resposta"
+          [invalid]="disabled"
+          [min]="getMin"
+          [max]="getMax"
+        />
+        <br />
+      </div>
+      <p-button label="Enviar" icon="pi pi-send" (click)="simularResposta()" />
+    </div>
+    <span [ngClass]="'mensagem-resposta ' + (disabled ? 'disabled' : '')"
+      >{{ mensagemResposta }}</span
+    >
+  </ng-container>
+  <ng-container *ngSwitchCase="'ESCALA'">
+    <div class="questao-element">
+      <div class="questao-body">
+        <h4>{{ questao?.titulo != '' ? questao?.titulo : 'Sem título' }}</h4>
+        <div class="inpu-selec" *ngIf="questao && questao.high">
+          <div
+            class="input-group"
+            *ngFor="let opcao of getArray(questao.high); let i = index"
+          >
+            <label for="opcao-{{opcao}}">{{opcao + 1}}</label>
+            <p-radiobutton
+              id="opcao-{{opcao}}"
+              [(ngModel)]="resposta"
+              [value]="opcao"
+            />
+          </div>
+        </div>
+      </div>
+      <p-button label="Enviar" icon="pi pi-send" (click)="simularResposta()" />
+    </div>
+    <span [ngClass]="'mensagem-resposta ' + (disabled ? 'disabled' : '')"
+      >{{ mensagemResposta }}</span
+    >
+  </ng-container>
+  <ng-container *ngSwitchDefault>
+    <p>Informe o tipo da questão!</p>
+  </ng-container>
+</ng-container>

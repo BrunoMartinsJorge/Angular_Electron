@@ -1,0 +1,126 @@
+<p-toast />
+<p-confirmpopup />
+<div class="info-page">
+  <h1>Listagem de Formulários</h1>
+  <span
+    >Aqui você pode visualizar todos os formulários cadastrados no
+    sistema.</span
+  >
+</div>
+<p-table
+  [value]="listOfForms"
+  [tableStyle]="{ width: '98%', 'margin': '2em auto' }"
+  stripedRows
+  showGridlines
+  [rows]="10"
+  [paginator]="true"
+>
+  <ng-template></ng-template>
+  <ng-template #header>
+    <tr>
+      <th>ID</th>
+      <th>Titulo</th>
+      <th>Descrição</th>
+      <th pSortableColumn="Data_Criacao">
+        <i class="pi pi-calendar"></i>Data de Criação
+        <p-sortIcon field="Data_Criacao" />
+      </th>
+      <th class="btn-list">Ações</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-form>
+    <tr>
+      <td>{{ form.idFormulario }}</td>
+      <td>{{ form.Titulo }}</td>
+      <td>{{ form.Descricao }}</td>
+      <td>{{ form.Data_Criacao | date : 'dd/MM/yyyy HH:mm' }}</td>
+      <td class="btn-list">
+        <p-button
+          [pTooltip]="form.Link_Url ? 'Acessar formulário' : 'Sem link de acesso'"
+          [disabled]="!form.Link_Url"
+          severity="success"
+          icon="pi pi-external-link"
+          (click)="acessarFormulario(form)"
+        />
+        <p-button
+          severity="warn"
+          pTooltip="Visualizar formulário"
+          icon="pi pi-eye"
+          (click)="visualizarFormulario(form)"
+        />
+        <p-button
+          severity="contrast"
+          pTooltip="Apagar formulário"
+          icon="pi pi-trash"
+          (click)="apagarFormulario($event, form.idFormulario)"
+        />
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="5">
+        Nenhum formulário cadastrado
+        <br />
+        <p-button
+          size="small"
+          label="Adicionar Formulário"
+          (click)="adicionarFormulario()"
+          icon="pi pi-plus"
+        ></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+<section class="form-info">
+  <div class="form-empty" *ngIf="!formularioSelecionado">
+    <h3>Nenhum formulário selecionado</h3>
+    <span
+      >Selecione um formulário para visualizar suas informações -
+      <strong>Clique no icone <i class="pi pi-eye"></i></strong
+    ></span>
+    <span style="flex-direction: column;">
+      <strong *ngIf="carregando_formulario">Aguarde...</strong>
+      <p-progressSpinner *ngIf="carregando_formulario"></p-progressSpinner>
+    </span>
+  </div>
+  <ng-container *ngIf="formularioSelecionado">
+    <h2>{{ formularioSelecionado?.Titulo }}</h2>
+    <p>
+      <strong>Descrição do formulário:</strong>
+      {{ formularioSelecionado?.Descricao }}
+    </p>
+    <div class="card-box">
+      Data de criação: 
+      {{formularioSelecionado?.Data_Criacao | date: "dd/MM/yyyy HH:mm"}}
+    </div>
+    <hr>
+    <h3>
+      Questões do Formulário
+    </h3>
+    <div class="questoes-list">
+      <div class="quest-element" *ngFor="let questao of questoes; let indexQuestao = index">
+        <span>
+          <strong> {{indexQuestao + 1}}ª Questão - </strong>
+          {{questao?.titulo}}
+        </span>
+        <p-fieldset toggleable="true" [collapsed]="true">
+              <ng-template #header>
+                  Respostas - {{questao?.resposta?.length}}
+                  <ng-template #expandicon>
+                    <i class="pi pi-eye-slash"></i>
+                  </ng-template>
+                  <ng-template #collapseicon>
+                    <i class="pi pi-eye"></i>
+                  </ng-template>
+              </ng-template>
+          <div class="response-list" *ngIf="questao?.resposta">
+            <div class="response-element" *ngFor="let resposta of questao?.resposta; let indexResposta = index">
+            <strong>{{indexResposta + 1}}ª Resposta - </strong> {{resposta?.valor}}    
+            </div>
+          </div>
+        </p-fieldset>
+      </div>
+    </div>
+  </ng-container>
+</section>
