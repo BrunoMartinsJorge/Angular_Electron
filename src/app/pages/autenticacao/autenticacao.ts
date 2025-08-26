@@ -16,7 +16,7 @@ export class Autenticacao {
   authenticateGoogle() {
     this.http.authenticate().subscribe({
       next: (response: any) => {
-        window.open(response.authUrl, '_blank', 'width=500,height=600');
+        window.open(response.urlAuth, '_blank', 'width=500,height=600');
         this.router.navigate(['/adicionar-formulario']);
         console.log(response);
       },

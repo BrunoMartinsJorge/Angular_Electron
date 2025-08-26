@@ -478,22 +478,18 @@ async function listarRespostas(formId) {
   }
 }
 
-
-
-
 const expressApp = express();
 expressApp.use(cors());
 expressApp.use(express.json());
-
 
 expressApp.get("/auth/google", (req, res) => {
   const url = oAuth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
     prompt: "consent",
-
   });
 
+  res.send({urlAuth: url});
 });
 
 expressApp.get("/oauth2callback", async (req, res) => {
@@ -506,14 +502,8 @@ expressApp.get("/oauth2callback", async (req, res) => {
   try {
     const { tokens } = await oAuth2Client.getToken({
       code,
-
     });
-
     oAuth2Client.setCredentials(tokens);
-
-
-    console.log("Tokens recebidos:", tokens);
-
     res.send("Autenticação concluída! Pode fechar esta janela.");
   } catch (err) {
     console.error("Erro no callback:", err);
