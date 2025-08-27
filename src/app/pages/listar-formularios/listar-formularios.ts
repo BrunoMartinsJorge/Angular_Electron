@@ -16,6 +16,7 @@ import { QuestaoModel } from '../../shared/models/questao.model';
 import { Resposta } from '../../shared/models/resposta.model';
 import { Fieldset } from 'primeng/fieldset';
 import { GerarPdf } from '../gerar-pdf/gerar-pdf';
+import { SelectButton } from "primeng/selectbutton";
 
 export interface Quest {
   titulo: string;
@@ -43,7 +44,8 @@ export interface Form{
     ProgressSpinner,
     Fieldset,
     GerarPdf,
-  ],
+    SelectButton
+],
   templateUrl: './listar-formularios.html',
   styleUrl: './listar-formularios.css',
   providers: [ConfirmationService, MessageService],
@@ -54,6 +56,7 @@ export class ListarFormularios {
   public formularioSelecionado: NewForm | any;
   public questoes: QuestaoModel[] = [];
   public habilitarGerarPDF: boolean = false;
+  public habilitarGerarGrafico: boolean = false;
   public formularioParaPDF: NewForm | any;
   public carregando_questoes: boolean = false;
   public form: Form = {
@@ -61,6 +64,11 @@ export class ListarFormularios {
     descricaoFormulario: '',
     questoes: [],
   };
+  public opcoesGraficos: any[] = [
+    { label: 'Pizza', value: 'pizza' },
+    { label: 'Barra', value: 'bar' },
+    { label: 'Linha', value: 'line' },
+  ];
 
   constructor(
     private formulariosService: FormulariosServices,
@@ -202,6 +210,10 @@ export class ListarFormularios {
 
   public adicionarFormulario(): void {
     this.router.navigate(['/adicionar-formulario']);
+  }
+
+  public abrirGrafico(): void {
+    this.habilitarGerarGrafico = true;
   }
 
   public apagarFormulario(event: Event, id: number): void {

@@ -103,11 +103,12 @@ CREATE TABLE IF NOT EXISTS tokens (
 `
 ).run();
 
+const devPath = path.join(__dirname, 'client_secret.json');
+const prodPath = path.join(process.resourcesPath, 'client_secret.json');
 
+const keyPath = fs.existsSync(devPath) ? devPath : prodPath;
 
-
-const keyPath = path.join(__dirname, "client_secret.json");
-const keys = JSON.parse(fs.readFileSync(keyPath));
+const keys = JSON.parse(fs.readFileSync(keyPath, 'utf-8'));
 
 const oAuth2Client = new google.auth.OAuth2(
   keys.web.client_id,
@@ -228,16 +229,16 @@ async function salvarFormularioCompleto(dadosForm) {
 
 
 function apagarFormulario(idFormulario) {
-  db.prepare("DELETE FROM Formulario WHERE idFormulario = ?").run(idFormulario);
+  db.prepare(
+    "DELETE FROM Alternativa WHERE Pergunta_idPergunta IN (SELECT idPergunta FROM Pergunta WHERE Formulario_idFormulario = ?)"
+  ).run(idFormulario);
   db.prepare("DELETE FROM Pergunta WHERE Formulario_idFormulario = ?").run(
     idFormulario
   );
   db.prepare(
-    "DELETE FROM Alternativa WHERE Pergunta_idPergunta IN (SELECT idPergunta FROM Pergunta WHERE Formulario_idFormulario = ?)"
-  ).run(idFormulario);
-  db.prepare(
     "DELETE FROM Resposta WHERE Pergunta_idPergunta IN (SELECT idPergunta FROM Pergunta WHERE Formulario_idFormulario = ?)"
   ).run(idFormulario);
+  db.prepare("DELETE FROM Formulario WHERE idFormulario = ?").run(idFormulario);
 }
 
 function listarFormularios() {

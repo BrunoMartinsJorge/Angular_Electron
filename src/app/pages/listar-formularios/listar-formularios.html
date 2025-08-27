@@ -128,13 +128,18 @@
         </p-fieldset>
       </div>
     </div>
+    <p-button label="Gerar Gráfico" severity="secondary" icon="pi pi-chart-bar" (click)="abrirGrafico()"></p-button>
   </ng-container>
 </section>
 <p-dialog [(visible)]="habilitarGerarPDF" header="Gerar PDF do formulário" [draggable]="false" [modal]="true" [style]="{ width: '60%' }">
   <app-gerar-pdf [formulario]="form" [hidden]="questoes.length == 0 && carregando_questoes"></app-gerar-pdf>
   <ng-container *ngIf="questoes.length == 0 && carregando_questoes">
-    <span>
+    <span style="flex-direction: column; display: flex; align-items: center; justify-content: center;">
       <p-progressSpinner></p-progressSpinner>
+      <strong>Aguarde enquanto as questões do formulário são carregadas</strong>
     </span>
   </ng-container>
+</p-dialog>
+<p-dialog [(visible)]="habilitarGerarGrafico" header="Gerar Gráfico" [draggable]="false" [modal]="true" [style]="{ width: '60%' }">
+  <p-selectbutton [options]="opcoesGraficos"></p-selectbutton>
 </p-dialog>

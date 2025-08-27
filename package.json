@@ -14,7 +14,7 @@
   },
   "build": {
     "appId": "com.seu-projeto.id",
-    "productName": "Gerenciador de Formulários AMAS",
+    "productName": "Gerenciador de Formulários",
     "files": [
       "dist/Angular_Electron/**/*",
       "main.js",
@@ -28,7 +28,8 @@
     "extraResources": [
       {
         "from": "client_secret.json",
-        "to": "client_secret.json"
+        "to": "client_secret.json",
+        "filter": ["**/*"]
       }
     ],
     "icon": "logo-amas.ico",
