@@ -11,14 +11,16 @@ export class Autenticado implements OnInit {
   constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      const token = params['token'];
-      if (token) {
-        localStorage.setItem('authToken', token);
-        this.router.navigate(['/listar-formularios']);
-      } else {
-        this.router.navigate(['/']);
-      }
-    });
+    console.log("Aqui!!");
+    
+    // this.route.queryParams.subscribe((params) => {
+    //   const token = params['token'];
+    //   if (token) {
+    //     localStorage.setItem('authToken', token);
+    //     this.router.navigate(['/listar-formularios']);
+    //   } else {
+    //     this.router.navigate(['/']);
+    //   }
+    // });
   }
 }

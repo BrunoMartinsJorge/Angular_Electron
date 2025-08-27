@@ -16,7 +16,7 @@ export const routes: Routes = [
         title: 'Autenticação',
     },
     {
-        path: 'auth/callback',
+        path: 'autenticado',
         component: Autenticado,
         title: 'Autenticado',
     },

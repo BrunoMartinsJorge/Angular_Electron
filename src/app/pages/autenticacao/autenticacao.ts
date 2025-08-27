@@ -14,15 +14,10 @@ export class Autenticacao {
   constructor(private http: Auth, private router: Router) {}
 
   authenticateGoogle() {
-    this.http.authenticate().subscribe({
-      next: (response: any) => {
-        window.open(response.urlAuth, '_blank', 'width=500,height=600');
+    this.http.loginWithGoogle()
+      .then(() => {
         this.router.navigate(['/adicionar-formulario']);
-        console.log(response);
-      },
-      error: (error: any) => {
-        console.error('Erro no teste do Express:', error);
-      },
-    });
+      })
+      .catch(err => console.error('Erro ao autenticar:', err));
   }
 }

@@ -14,12 +14,22 @@ router.get("/oauth2callback", async (req, res) => {
   if (!code) return res.status(400).send("Código não recebido do Google.");
 
   try {
-    const { tokens } = await oAuth2Client.getToken({ code });
+    const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
-    res.send("Autenticação concluída! Pode fechar esta janela.");
+    res.send(`
+      <html>
+        <body style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;">
+          <h2>Autenticação concluída!</h2>
+          <p>Você já pode fechar esta aba.</p>
+          <script>
+            window.opener.postMessage({ token: ${JSON.stringify(tokens)} }, "http://localhost:4200");
+          </script>
+        </body>
+      </html>
+    `);
   } catch (err) {
-    console.error("Erro no callback:", err);
-    res.status(500).send("Erro ao autenticar com o Google.");
+    console.error(err);
+    res.status(500).send("Erro na autenticação.");
   }
 });
 
