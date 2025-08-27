@@ -14,7 +14,21 @@ import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { QuestaoModel } from '../../shared/models/questao.model';
 import { Resposta } from '../../shared/models/resposta.model';
-import { Fieldset } from "primeng/fieldset";
+import { Fieldset } from 'primeng/fieldset';
+import { GerarPdf } from '../gerar-pdf/gerar-pdf';
+
+export interface Quest {
+  titulo: string;
+  tipoQuestao: 'TEXT' | 'RADIO' | 'ESCALA';
+  opcoes?: string[];
+  escala?: { min: number; max: number };
+}
+
+export interface Form{
+  titulo: string;
+  descricaoFormulario: string;
+  questoes: Quest[];
+}
 
 @Component({
   selector: 'app-listar-formularios',
@@ -27,8 +41,9 @@ import { Fieldset } from "primeng/fieldset";
     ToastModule,
     DialogModule,
     ProgressSpinner,
-    Fieldset
-],
+    Fieldset,
+    GerarPdf,
+  ],
   templateUrl: './listar-formularios.html',
   styleUrl: './listar-formularios.css',
   providers: [ConfirmationService, MessageService],
@@ -38,6 +53,14 @@ export class ListarFormularios {
   public carregando_formulario: boolean = false;
   public formularioSelecionado: NewForm | any;
   public questoes: QuestaoModel[] = [];
+  public habilitarGerarPDF: boolean = false;
+  public formularioParaPDF: NewForm | any;
+  public carregando_questoes: boolean = false;
+  public form: Form = {
+    titulo: '',
+    descricaoFormulario: '',
+    questoes: [],
+  };
 
   constructor(
     private formulariosService: FormulariosServices,
@@ -59,11 +82,52 @@ export class ListarFormularios {
     });
   }
 
+  private converterDados(questoes: any[]): Quest[] {
+    return questoes
+      .map((item) => {
+        const question = item.questionItem?.question;
+
+        if (!question) return null;
+
+        if (question.choiceQuestion) {
+          return {
+            titulo: item.title,
+            tipoQuestao: 'RADIO',
+            opcoes: question.choiceQuestion.options.map(
+              (opt: any) => opt.value
+            ),
+          } as Quest;
+        }
+
+        if (question.textQuestion) {
+          return {
+            titulo: item.title,
+            tipoQuestao: 'TEXT',
+          } as Quest;
+        }
+
+        if (question.scaleQuestion) {
+          return {
+            titulo: item.title,
+            tipoQuestao: 'ESCALA',
+            escala: {
+              min: question.scaleQuestion.low,
+              max: question.scaleQuestion.high,
+            },
+          } as Quest;
+        }
+
+        return null;
+      })
+      .filter((q): q is Quest => q !== null);
+  }
+
   public acessarFormulario(form: any): void {
     window.open(form.Link_Url, '_blank');
   }
 
   public visualizarFormulario(form: any): void {
+    if (!form.formId) return;
     this.formularioSelecionado = null;
     this.carregando_formulario = true;
     this.formulariosService
@@ -108,6 +172,30 @@ export class ListarFormularios {
         complete: () => {
           this.formularioSelecionado = form;
           this.carregando_formulario = false;
+        },
+      });
+  }
+
+  public gerarPDF(formulario: any): void {
+    this.habilitarGerarPDF = true;
+    this.formularioParaPDF = formulario;
+    this.questoes = [];
+    this.carregando_questoes = true;
+    this.formulariosService
+      .buscarQuestoesDeFormularioPorIdForm(formulario.formId)
+      .subscribe({
+        next: (response: any) => {
+          this.form.questoes = this.converterDados(response.items as any[]);
+          this.form.titulo = formulario.Titulo;
+          this.form.descricaoFormulario = formulario.Descricao;
+          console.log(this.form);
+          
+        },
+        error: (error: Error) => {
+          console.error(error);
+        },
+        complete: () => {
+          this.carregando_questoes = false;
         },
       });
   }

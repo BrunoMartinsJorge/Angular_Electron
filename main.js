@@ -1,6 +1,3 @@
-
-
-
 const { app: electronApp, BrowserWindow } = require("electron");
 const path = require("path");
 const url = require("url");
@@ -10,11 +7,8 @@ const cors = require("cors");
 const fs = require("fs");
 const { google } = require("googleapis");
 
-
-
-
 const userDataPath = electronApp.getPath("userData");
-const dbPath = path.join(userDataPath, "seu-banco-de-dados.db");
+const dbPath = path.join(userDataPath, "banco.db");
 const db = new Database(dbPath);
 
 
@@ -163,62 +157,75 @@ async function getAuthClient() {
   return oAuth2Client;
 }
 
+async function salvarFormularioCompleto(dadosForm) {
+  console.log(dadosForm);
+  const insertFormulario = db.prepare(
+    "INSERT INTO Formulario (Titulo, Descricao, Link_Url, formId) VALUES (?, ?, ?, ?)"
+  );
+
+  const insertPergunta = db.prepare(
+    "INSERT INTO Pergunta (Tipo_Pergunta_idTipo_Pergunta, Formulario_idFormulario, Titulo, Obrigatorio, Favorita) VALUES (?, ?, ?, ?, ?)"
+  );
+
+  const insertAlternativa = db.prepare(
+    "INSERT INTO Alternativa (Pergunta_idPergunta, Texto) VALUES (?, ?)"
+  );
+
+  const getTipoPergunta = db.prepare(
+    "SELECT idTipo_Pergunta FROM Tipo_Pergunta WHERE Descricao = ?"
+  );
 
 
+  const salvar = db.transaction((dadosForm) => {
 
-function inserirDados(dadosForm, tabela) {
-  switch (tabela) {
-    case "Formulario":
-      db.prepare(
-        "INSERT INTO Formulario (Titulo, Descricao, Link_Url, formId) VALUES (?, ?, ?, ?)"
-      ).run(
-        dadosForm.titulo,
-        dadosForm.descricao,
-        dadosForm.linkUrl,
-        dadosForm.formId
+    const result = insertFormulario.run(
+      dadosForm.titulo,
+      dadosForm.descricao,
+      dadosForm.linkUrl,
+      dadosForm.formId
+    );
+
+    const formularioId = result.lastInsertRowid;
+
+
+    dadosForm.questoes.forEach((q) => {
+
+      const tipo = getTipoPergunta.get(q.tipo);
+      let tipoId;
+      if (tipo) {
+        tipoId = tipo.idTipo_Pergunta;
+      } else {
+
+        const novoTipo = db
+          .prepare("INSERT INTO Tipo_Pergunta (Descricao) VALUES (?)")
+          .run(q.tipo);
+        tipoId = novoTipo.lastInsertRowid;
+      }
+
+      const resPergunta = insertPergunta.run(
+        tipoId,
+        formularioId,
+        q.titulo,
+        q.obrigatoria ? 1 : 0,
+        q.favorito ? 1 : 0
       );
-      break;
-    case "Tipo_Pergunta":
-      db.prepare("INSERT INTO Tipo_Pergunta (Descricao) VALUES (?)").run(
-        dadosForm.descricao
-      );
-      break;
-    case "Pergunta":
-      db.prepare(
-        "INSERT INTO Pergunta (Tipo_Pergunta_idTipo_Pergunta, Formulario_idFormulario, Titulo, Descricao, Obrigatorio) VALUES (?, ?, ?, ?, ?)"
-      ).run(
-        dadosForm.tipoId,
-        dadosForm.formularioId,
-        dadosForm.titulo,
-        dadosForm.descricao,
-        dadosForm.obrigatorio
-      );
-      break;
-    case "Alternativa":
-      db.prepare(
-        "INSERT INTO Alternativa (Pergunta_idPergunta, Texto) VALUES (?, ?)"
-      ).run(dadosForm.perguntaId, dadosForm.texto);
-      break;
-    case "Participante":
-      db.prepare("INSERT INTO Participante (Nome, Email) VALUES (?, ?)").run(
-        dadosForm.nome,
-        dadosForm.email
-      );
-      break;
-    case "Resposta":
-      db.prepare(
-        "INSERT INTO Resposta (Participante_idParticipante, Pergunta_idPergunta, Valor, Data_Resposta) VALUES (?, ?, ?, ?)"
-      ).run(
-        dadosForm.participanteId,
-        dadosForm.perguntaId,
-        dadosForm.valor,
-        dadosForm.data
-      );
-      break;
-    default:
-      console.error("Tabela desconhecida:", tabela);
-  }
+
+      const perguntaId = resPergunta.lastInsertRowid;
+
+
+      if (q.opcoes && q.opcoes.length > 0) {
+        q.opcoes.forEach((opcao) => {
+          insertAlternativa.run(perguntaId, opcao);
+        });
+      }
+    });
+
+    return formularioId;
+  });
+
+  return salvar(dadosForm);
 }
+
 
 function apagarFormulario(idFormulario) {
   db.prepare("DELETE FROM Formulario WHERE idFormulario = ?").run(idFormulario);
@@ -235,6 +242,10 @@ function apagarFormulario(idFormulario) {
 
 function listarFormularios() {
   return db.prepare("SELECT * FROM Formulario ORDER BY idFormulario").all();
+}
+
+function listarQuestoesPorFormulario(idForm) {
+  return db.prepare("SELECT * FROM Pergunta WHERE Formulario_idFormulario = ? ORDER BY idPergunta").all(idForm);
 }
 
 function buscarFormularioPorId(idFormulario) {
@@ -489,7 +500,7 @@ expressApp.get("/auth/google", (req, res) => {
     prompt: "consent",
   });
 
-  res.send({urlAuth: url});
+  res.send({ urlAuth: url });
 });
 
 expressApp.get("/oauth2callback", async (req, res) => {
@@ -514,16 +525,7 @@ expressApp.get("/oauth2callback", async (req, res) => {
 expressApp.post("/api/quiz", async (req, res) => {
   try {
     const resultado = await criarQuiz(req.body);
-    inserirDados(
-      {
-        titulo: resultado.titulo,
-        descricao: resultado.descricao,
-        linkUrl: resultado.formUrl,
-        formId: resultado.formId,
-        questoes: resultado.questoes,
-      },
-      "Formulario"
-    );
+    salvarFormularioCompleto(req.body);
     res.status(201).json(resultado);
   } catch (err) {
     console.error("Erro ao criar quiz:", err.message || err);
@@ -537,16 +539,14 @@ expressApp.post("/api/quiz", async (req, res) => {
 expressApp.post("/api/forms", async (req, res) => {
   try {
     const resultado = await createGoogleForm(req.body);
-    inserirDados(
-      {
-        titulo: resultado.titulo,
-        descricao: resultado.descricao,
-        linkUrl: resultado.formUrl,
-        formId: resultado.formId,
-        questoes: resultado.questoes,
-      },
-      "Formulario"
-    );
+    const dadosSalvar = {
+      titulo: req.body.titulo,
+      descricao: req.body.descricao,
+      questoes: req.body.questoes,
+      formId: resultado.formId,
+      linkUrl: resultado.formUrl,
+    }
+    const idForm = await salvarFormularioCompleto(dadosSalvar);
     res.status(201).json(resultado);
   } catch (err) {
     console.error("Erro ao criar formulário:", err.message || err);
@@ -554,6 +554,21 @@ expressApp.post("/api/forms", async (req, res) => {
       error: "Erro ao criar formulário.",
       details: err.message || err,
     });
+  }
+});
+
+expressApp.get("/forms/quest/:formId", async (req, res) => {
+  const formId = req.params.formId;
+  const forms = google.forms({ version: "v1", auth: oAuth2Client });
+
+  try {
+    const formRes = await forms.forms.get({ formId });
+    const items = formRes.data.items || [];
+
+    res.json({ items });
+  } catch (err) {
+    console.error("Erro ao buscar formulário ou respostas:", err);
+    res.status(500).send("Erro ao buscar dados do formulário.");
   }
 });
 

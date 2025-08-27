@@ -54,6 +54,12 @@
           icon="pi pi-trash"
           (click)="apagarFormulario($event, form.idFormulario)"
         />
+        <p-button
+          severity="info"
+          pTooltip="Gerar PDF do formulário"
+          icon="pi pi-file"
+          (click)="gerarPDF(form)"
+        />
       </td>
     </tr>
   </ng-template>
@@ -124,3 +130,11 @@
     </div>
   </ng-container>
 </section>
+<p-dialog [(visible)]="habilitarGerarPDF" header="Gerar PDF do formulário" [draggable]="false" [modal]="true" [style]="{ width: '60%' }">
+  <app-gerar-pdf [formulario]="form" [hidden]="questoes.length == 0 && carregando_questoes"></app-gerar-pdf>
+  <ng-container *ngIf="questoes.length == 0 && carregando_questoes">
+    <span>
+      <p-progressSpinner></p-progressSpinner>
+    </span>
+  </ng-container>
+</p-dialog>

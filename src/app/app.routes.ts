@@ -7,6 +7,7 @@ import { VisualisarFormulario } from './pages/visualisar-formulario/visualisar-f
 import { AdicionarQuiz } from './pages/adicionar-quiz/adicionar-quiz';
 import { ListarQuiz } from './pages/listar-quiz/listar-quiz';
 import { Autenticado } from './pages/autenticado/autenticado';
+import { GerarPdf } from './pages/gerar-pdf/gerar-pdf';
 
 export const routes: Routes = [
     {
@@ -46,6 +47,12 @@ export const routes: Routes = [
     {
         path: 'ver-formulario/:id',
         component: VisualisarFormulario,
+        title: 'Visualizar Formulário',
+        canActivate: [authGuardGuard],
+    },
+    {
+        path: 'gerar-formulario',
+        component: GerarPdf,
         title: 'Visualizar Formulário',
         canActivate: [authGuardGuard],
     }

@@ -32,4 +32,8 @@ export class FormulariosServices {
   public buscarRespostasDeFormularioPorIdForm(formId: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/forms/${formId}/responses`);
   }
+
+  public buscarQuestoesDeFormularioPorIdForm(formId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/forms/quest/${formId}`);
+  }
 }
