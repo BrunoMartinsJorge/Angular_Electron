@@ -1,0 +1,51 @@
+main {
+    display: flex;
+    flex-direction: column;
+    grid-gap: 1em;
+}
+
+.opcoes-graficos{
+    display: flex;
+    flex-direction: column;
+    grid-gap: 0.5em;
+}
+
+.lista-questoes{
+    display: flex;
+    flex-direction: column;
+    grid-gap: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.opcoes-questao{
+    display: flex;
+    align-items: center;
+    grid-gap: 0.5em;
+    text-align: center;
+}
+
+.lista-graficos{
+    display: flex;
+    flex-direction: column;
+    grid-gap: 0.5em;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+strong{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: rgba(212, 7, 7, 0.893);
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border-radius: 50%;
+    cursor: pointer;
+}

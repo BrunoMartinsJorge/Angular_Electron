@@ -9,13 +9,12 @@
 </div>
 <p-table
   [value]="listOfForms"
-  [tableStyle]="{ width: '98%', 'margin': '2em auto' }"
+  [tableStyle]="{ maxWidth: '98%', 'margin': '2em auto' }"
   stripedRows
   showGridlines
   [rows]="10"
   [paginator]="true"
 >
-  <ng-template></ng-template>
   <ng-template #header>
     <tr>
       <th>ID</th>
@@ -85,7 +84,7 @@
       >Selecione um formulário para visualizar suas informações -
       <strong>Clique no icone <i class="pi pi-eye"></i></strong
     ></span>
-    <span style="flex-direction: column;">
+    <span style="flex-direction: column">
       <strong *ngIf="carregando_formulario">Aguarde...</strong>
       <p-progressSpinner *ngIf="carregando_formulario"></p-progressSpinner>
     </span>
@@ -97,49 +96,81 @@
       {{ formularioSelecionado?.Descricao }}
     </p>
     <div class="card-box">
-      Data de criação: 
-      {{formularioSelecionado?.Data_Criacao | date: "dd/MM/yyyy HH:mm"}}
+      Data de criação: {{formularioSelecionado?.Data_Criacao | date: "dd/MM/yyyy
+      HH:mm"}}
     </div>
-    <hr>
-    <h3>
-      Questões do Formulário
-    </h3>
+    <hr />
+    <h3>Questões do Formulário</h3>
     <div class="questoes-list">
-      <div class="quest-element" *ngFor="let questao of questoes; let indexQuestao = index">
+      <div
+        class="quest-element"
+        *ngFor="let questao of questoes; let indexQuestao = index"
+      >
         <span>
           <strong> {{indexQuestao + 1}}ª Questão - </strong>
           {{questao?.titulo}}
         </span>
         <p-fieldset toggleable="true" [collapsed]="true">
-              <ng-template #header>
-                  Respostas - {{questao?.resposta?.length}}
-                  <ng-template #expandicon>
-                    <i class="pi pi-eye-slash"></i>
-                  </ng-template>
-                  <ng-template #collapseicon>
-                    <i class="pi pi-eye"></i>
-                  </ng-template>
-              </ng-template>
+          <ng-template #header>
+            Respostas - {{questao?.resposta?.length}}
+            <ng-template #expandicon>
+              <i class="pi pi-eye-slash"></i>
+            </ng-template>
+            <ng-template #collapseicon>
+              <i class="pi pi-eye"></i>
+            </ng-template>
+          </ng-template>
           <div class="response-list" *ngIf="questao?.resposta">
-            <div class="response-element" *ngFor="let resposta of questao?.resposta; let indexResposta = index">
-            <strong>{{indexResposta + 1}}ª Resposta - </strong> {{resposta?.valor}}    
+            <div
+              class="response-element"
+              *ngFor="let resposta of questao?.resposta; let indexResposta = index"
+            >
+              <strong>{{indexResposta + 1}}ª Resposta - </strong>
+              {{resposta?.valor}}
             </div>
           </div>
         </p-fieldset>
       </div>
     </div>
-    <p-button label="Gerar Gráfico" severity="secondary" icon="pi pi-chart-bar" (click)="abrirGrafico()"></p-button>
+    <p-button
+      label="Gerar Gráfico"
+      severity="secondary"
+      icon="pi pi-chart-bar"
+      (click)="abrirGrafico()"
+    ></p-button>
   </ng-container>
 </section>
-<p-dialog [(visible)]="habilitarGerarPDF" header="Gerar PDF do formulário" [draggable]="false" [modal]="true" [style]="{ width: '60%' }">
-  <app-gerar-pdf [formulario]="form" [hidden]="questoes.length == 0 && carregando_questoes"></app-gerar-pdf>
+<p-dialog
+  [(visible)]="habilitarGerarPDF"
+  header="Gerar PDF do formulário"
+  [draggable]="false"
+  [modal]="true"
+  [style]="{ width: '60%' }"
+>
+  <app-gerar-pdf
+    [formulario]="form"
+    [hidden]="questoes.length == 0 && carregando_questoes"
+  ></app-gerar-pdf>
   <ng-container *ngIf="questoes.length == 0 && carregando_questoes">
-    <span style="flex-direction: column; display: flex; align-items: center; justify-content: center;">
+    <span
+      style="
+        flex-direction: column;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
       <p-progressSpinner></p-progressSpinner>
       <strong>Aguarde enquanto as questões do formulário são carregadas</strong>
     </span>
   </ng-container>
 </p-dialog>
-<p-dialog [(visible)]="habilitarGerarGrafico" header="Gerar Gráfico" [draggable]="false" [modal]="true" [style]="{ width: '60%' }">
-  <p-selectbutton [options]="opcoesGraficos"></p-selectbutton>
+<p-dialog
+  [(visible)]="habilitarGerarGrafico"
+  header="Gerar Gráfico"
+  [draggable]="false"
+  [modal]="true"
+  [style]="{ width: '60%' }"
+>
+  <app-gerar-graficos [questoesRespondidas]="questoes"></app-gerar-graficos>
 </p-dialog>

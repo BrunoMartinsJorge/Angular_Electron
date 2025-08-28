@@ -12,7 +12,7 @@ async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: path.join(__dirname, "logo-amas.ico"),
+    icon: path.join(__dirname, "logo.ico"),
     webPreferences: { nodeIntegration: true, contextIsolation: false },
   });
 

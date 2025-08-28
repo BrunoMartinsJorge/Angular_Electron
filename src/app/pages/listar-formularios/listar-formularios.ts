@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Type } from '@angular/core';
 import { Formulario } from '../../shared/models/formulario.model';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -16,7 +16,9 @@ import { QuestaoModel } from '../../shared/models/questao.model';
 import { Resposta } from '../../shared/models/resposta.model';
 import { Fieldset } from 'primeng/fieldset';
 import { GerarPdf } from '../gerar-pdf/gerar-pdf';
-import { SelectButton } from "primeng/selectbutton";
+import { SelectButton } from 'primeng/selectbutton';
+import { GerarGraficos } from '../gerar-graficos/gerar-graficos';
+import { TypeQuestEnum } from '../adicionar-formulario/enums/TypeQuestEnum';
 
 export interface Quest {
   titulo: string;
@@ -25,7 +27,7 @@ export interface Quest {
   escala?: { min: number; max: number };
 }
 
-export interface Form{
+export interface Form {
   titulo: string;
   descricaoFormulario: string;
   questoes: Quest[];
@@ -44,8 +46,8 @@ export interface Form{
     ProgressSpinner,
     Fieldset,
     GerarPdf,
-    SelectButton
-],
+    GerarGraficos,
+  ],
   templateUrl: './listar-formularios.html',
   styleUrl: './listar-formularios.css',
   providers: [ConfirmationService, MessageService],
@@ -64,11 +66,7 @@ export class ListarFormularios {
     descricaoFormulario: '',
     questoes: [],
   };
-  public opcoesGraficos: any[] = [
-    { label: 'Pizza', value: 'pizza' },
-    { label: 'Barra', value: 'bar' },
-    { label: 'Linha', value: 'line' },
-  ];
+  public opcoesGraficos: any[] = [];
 
   constructor(
     private formulariosService: FormulariosServices,
@@ -138,6 +136,7 @@ export class ListarFormularios {
     if (!form.formId) return;
     this.formularioSelecionado = null;
     this.carregando_formulario = true;
+
     this.formulariosService
       .buscarRespostasDeFormularioPorIdForm(form.formId)
       .subscribe({
@@ -145,15 +144,29 @@ export class ListarFormularios {
           this.formularioSelecionado = response;
           const questoes: QuestaoModel[] = [];
 
-          const questionMap: { [key: string]: string } = {};
+          const questionMap: {
+            [key: string]: { titulo: string; tipo: TypeQuestEnum };
+          } = {};
+
           response.items.forEach((item: any) => {
             if (item.questionItem) {
-              questionMap[item.questionItem.question.questionId] = item.title;
+              const q = item.questionItem.question;
+              let tipo: TypeQuestEnum = TypeQuestEnum.UNICA;
+              if (q.textQuestion) tipo = TypeQuestEnum.TEXTO;
+              else if (q.paragraphQuestion) tipo = TypeQuestEnum.PARAGRAFO;
+              else if (q.choiceQuestion) tipo = TypeQuestEnum.UNICA;
+              else if (q.checkboxQuestion) tipo = TypeQuestEnum.MULTIPLA;
+              else if (q.dateQuestion) tipo = TypeQuestEnum.DATA;
+              else if (q.scaleQuestion) tipo = TypeQuestEnum.ESCALA;
+              else if (q.boolQuestion) tipo = TypeQuestEnum.VERDADEIRO_FALSO;
+
+              questionMap[q.questionId] = { titulo: item.title, tipo };
             }
           });
 
-          Object.entries(questionMap).forEach(([qId, titulo]) => {
+          Object.entries(questionMap).forEach(([qId, { titulo, tipo }]) => {
             const respostas: Resposta[] = [];
+
             response.responses.forEach((resp: any) => {
               const answer = resp.answers[qId];
               if (answer?.textAnswers?.answers?.length) {
@@ -169,13 +182,18 @@ export class ListarFormularios {
                 });
               }
             });
-            questoes.push(new QuestaoModel(qId, titulo, respostas));
+            questoes.push(new QuestaoModel(qId, titulo, respostas, tipo));
           });
 
           this.questoes = questoes;
         },
         error: (error: Error) => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro ao buscar respostas',
+            detail: error.message
+          })
         },
         complete: () => {
           this.formularioSelecionado = form;
@@ -197,9 +215,13 @@ export class ListarFormularios {
           this.form.titulo = formulario.Titulo;
           this.form.descricaoFormulario = formulario.Descricao;
           console.log(this.form);
-          
         },
         error: (error: Error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro ao gerar PDF',
+            detail: error.message,
+          })
           console.error(error);
         },
         complete: () => {

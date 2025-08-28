@@ -1,0 +1,82 @@
+<main>
+  <p-fieldset legend="Configurações do gráfico">
+    <div class="opcoes-graficos">
+      <span>Escolha o tipo de gráfico</span>
+      <p-selectbutton
+        [options]="listaOpcoesGraficos"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="selectGraph($event)"
+        selectedOptions="graficoEscolhido"
+        [(ngModel)]="graficoEscolhido"
+      ></p-selectbutton>
+    </div>
+    <br />
+    <hr />
+    <br />
+    <div class="lista-questoes">
+      <span>Selecione a questão para gerar o gráfico</span>
+      <div *ngFor="let category of questoesRespondidas" class="opcoes-questao">
+        <p-radioButton
+          [inputId]="category.idQuestao"
+          name="category"
+          [value]="category"
+          [(ngModel)]="questaoSelecionada"
+        />
+        <label [for]="category.idQuestao" class="ml-2"
+          >{{ category.titulo }}</label
+        >
+      </div>
+    </div>
+    <p-button
+      label="Gerar Gráficos"
+      severity="secondary"
+      icon="pi pi-chart-bar"
+      [disabled]="!enableGraphGeneration()"
+      (click)="generateGraph()"
+    />
+  </p-fieldset>
+  <p-fieldset
+    legend="Gráficos criados"
+    toggleable="true"
+    [collapsed]="false"
+    *ngIf="graficos.length > 0"
+  >
+    <p-inputgroup *ngFor="let grafico of graficos; let i = index">
+      <p-button label="Apagar" severity="danger" icon="pi pi-trash" />
+      <input
+        pInputText
+        [placeholder]="(i+1) + '# - ' + grafico.datasets[0].label"
+        [disabled]="true"
+      />
+    </p-inputgroup>
+  </p-fieldset>
+  <p-fieldset
+    legend="Visualizar gráficos"
+    toggleable="true"
+    [collapsed]="true"
+    *ngIf="enablePDFGeneration()"
+  >
+    <div class="lista-graficos" #pdfGraph>
+      <div *ngFor="let grafico of graficos; let i = index">
+        <span>
+          <h3>{{ grafico.datasets[0].label }}</h3>
+        </span>
+        <p-chart
+          [type]="graficoEscolhido"
+          [data]="grafico"
+          [style]="{ maxWidth: '350px' }"
+        ></p-chart>
+      </div>
+    </div>
+  </p-fieldset>
+  <p-footer>
+    <p-button
+      label="Gerar PDF"
+      severity="secondary"
+      icon="pi pi-file"
+      (click)="generatePDFOfGraph()"
+      [disabled]="!enablePDFGeneration()"
+    />
+  </p-footer>
+</main>

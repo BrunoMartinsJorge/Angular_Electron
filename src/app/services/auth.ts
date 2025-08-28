@@ -4,26 +4,39 @@ import { environment } from '../core/environments/environment';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class Auth {
-
   private baseUrl = environment.apiUrl;
-  
-  constructor(private http: HttpClient) {}
 
-  public authenticate(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/auth/google`);
-  }
+  constructor(private http: HttpClient) {}
 
   public loginWithGoogle(): Promise<any> {
     return new Promise((resolve, reject) => {
       this.authenticate().subscribe({
         next: (response) => {
-          const popup = window.open(response.urlAuth, '_blank', 'width=500,height=600');
+          const popup = window.open(
+            response.urlAuth,
+            '_blank',
+            'width=500,height=600'
+          );
 
           const listener = (event: MessageEvent) => {
-            if (event.origin !== 'http://localhost:3000') return;
+            // 🔹 Detecta se está no Electron
+            const isElectron = !!(
+              window &&
+              (window as any).process &&
+              (window as any).process.type
+            );
+
+            // 🔹 Define a origem permitida
+            const allowedOrigin = isElectron ? 'null' : 'http://localhost:3000';
+
+            // 🔹 Valida a origem (no Electron geralmente vem "null")
+            if (event.origin !== allowedOrigin && allowedOrigin !== 'null')
+              return;
+
+            // 🔹 Continua se recebeu token
             const token = event.data?.token;
             if (token) {
               localStorage.setItem('googleToken', JSON.stringify(token));
@@ -37,5 +50,9 @@ export class Auth {
         error: (err) => reject(err),
       });
     });
+  }
+
+  private authenticate(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/auth/google`);
   }
 }

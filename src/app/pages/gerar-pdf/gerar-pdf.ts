@@ -18,7 +18,6 @@ export class GerarPdf implements OnInit {
   resposta: any;
 
   ngOnInit(): void {
-    console.log(this.formulario);
   }
 
   public gerarPDF(): void{

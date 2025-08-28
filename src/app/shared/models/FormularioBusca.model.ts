@@ -1,3 +1,4 @@
+import { TypeQuestEnum } from '../../pages/adicionar-formulario/enums/TypeQuestEnum';
 import { QuestaoModel } from './questao.model';
 import { Resposta } from './resposta.model';
 
@@ -58,7 +59,7 @@ export function formatarQuestoes(
       }
     });
 
-    questoes.push(new QuestaoModel(questionId, titulo, respostas));
+    questoes.push(new QuestaoModel(questionId, titulo, respostas, TypeQuestEnum.UNICA));
   });
 
   return questoes;

@@ -1,6 +1,7 @@
 const express = require("express");
 const { oAuth2Client, SCOPES } = require("./googleAuth");
 const { criarQuiz, createGoogleForm, salvarFormularioCompleto, listarFormularios, apagarFormulario, buscarFormularioPorId, listarRespostas } = require("./formService");
+const { google } = require("googleapis");
 
 const router = express.Router();
 
@@ -22,8 +23,10 @@ router.get("/oauth2callback", async (req, res) => {
           <h2>Autenticação concluída!</h2>
           <p>Você já pode fechar esta aba.</p>
           <script>
-            window.opener.postMessage({ token: ${JSON.stringify(tokens)} }, "http://localhost:4200");
-          </script>
+            window.opener.postMessage(
+              { token: ${JSON.stringify(tokens)} },
+            "*"
+          );</script>
         </body>
       </html>
     `);
@@ -91,7 +94,7 @@ router.get("/api/forms", (req, res) => res.json(listarFormularios()));
 
 router.delete("/api/forms/:formId", (req, res) => {
   apagarFormulario(req.params.formId);
-  res.send("Formulário apagado com sucesso!");
+  res.sendStatus(200);
 });
 
 module.exports = router;

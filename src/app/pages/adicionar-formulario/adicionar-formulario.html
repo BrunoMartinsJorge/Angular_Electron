@@ -90,7 +90,7 @@
     </div>
     <div
       class="inputs-list"
-      *ngIf="questao.tipo && (questao.tipo === 'UNICA' || questao.tipo === 'MULTIPLA' || questao.tipo === 'CHECKBOX')"
+      *ngIf="questao.tipo && (questao.tipo === 'UNICA' || questao.tipo === 'MULTIPLA')"
     >
       <p-inputgroup
         pSize="small"
@@ -135,7 +135,7 @@
       <input [(ngModel)]="questao.endLabel" placeholder="Label fim" /> -->
     </div>
 
-    <div *ngIf="questao.tipo === 'UPLOAD'">
+    <!-- <div *ngIf="questao.tipo === 'UPLOAD'">
       <input
         type="number"
         [(ngModel)]="questao.maxFiles"
@@ -150,7 +150,7 @@
         [(ngModel)]="questao.allowedMimeTypes"
         placeholder="Tipos permitidos, separados por vírgula"
       />
-    </div>
+    </div> -->
     <div class="input-group">
       <label for="descricao-quest">Questão Obrigatória?</label>
       <p-toggleswitch [(ngModel)]="questao.obrigatoria" />

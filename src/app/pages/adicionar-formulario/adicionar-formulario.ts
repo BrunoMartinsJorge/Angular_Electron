@@ -106,7 +106,6 @@ export class AdicionarFormulario {
     { nome: 'Única Escolha', value: TypeQuestEnum.UNICA },
     { nome: 'Múltipla Escolha', value: TypeQuestEnum.MULTIPLA },
     { nome: 'Data', value: TypeQuestEnum.DATA },
-    // { nome: 'Data e Hora', value: TypeQuestEnum.DATAHORA },
     { nome: 'Escala', value: TypeQuestEnum.ESCALA },
     { nome: 'Verdadeiro / Falso', value: TypeQuestEnum.VERDADEIRO_FALSO },
   ];

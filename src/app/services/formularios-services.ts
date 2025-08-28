@@ -21,14 +21,15 @@ export class FormulariosServices {
     return this.http.post<any>(`${this.baseUrl}/api/quiz`, quiz);
   }
 
-  public listarFormularios(): Observable<Formulario[]>{
+  public listarFormularios(): Observable<Formulario[]> {
     return this.http.get<Formulario[]>(`${this.baseUrl}/api/forms`);
   }
 
-  public deletarFormulario(formId: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/api/forms/${formId}`);
+  public deletarFormulario(formId: number) {
+    return this.http.delete(`${this.baseUrl}/api/forms/${formId}`, {
+      responseType: 'text',
+    });
   }
-
   public buscarRespostasDeFormularioPorIdForm(formId: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/forms/${formId}/responses`);
   }
