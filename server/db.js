@@ -6,9 +6,6 @@ const userDataPath = electronApp.getPath("userData");
 const dbPath = path.join(userDataPath, "banco.db");
 const db = new Database(dbPath);
 
-// Criar tabelas
-try { db.prepare("ALTER TABLE Formulario ADD COLUMN formId TEXT").run(); } catch (err) {}
-
 db.prepare(`
 CREATE TABLE IF NOT EXISTS Formulario (
   idFormulario INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,10 +1,14 @@
 export class GraficoModel {
   public labels: string[];
   public datasets: DatasetsModel[];
+  public descricao: string;
+  public posicao: 'left' | 'right' = 'left';
+  public options: any = {};
 
-  constructor(label: string[], datasets: DatasetsModel[]) {
+  constructor(label: string[], datasets: DatasetsModel[], descricao: string) {
     this.labels = label;
     this.datasets = datasets;
+    this.descricao = descricao;
   }
 }
 

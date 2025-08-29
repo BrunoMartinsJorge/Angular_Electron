@@ -6,7 +6,6 @@ import { AdicionarFormulario } from './pages/adicionar-formulario/adicionar-form
 import { VisualisarFormulario } from './pages/visualisar-formulario/visualisar-formulario';
 import { AdicionarQuiz } from './pages/adicionar-quiz/adicionar-quiz';
 import { ListarQuiz } from './pages/listar-quiz/listar-quiz';
-import { Autenticado } from './pages/autenticado/autenticado';
 import { GerarPdf } from './pages/gerar-pdf/gerar-pdf';
 
 export const routes: Routes = [
@@ -14,11 +13,6 @@ export const routes: Routes = [
         path: '',
         component: Autenticacao,
         title: 'Autenticação',
-    },
-    {
-        path: 'autenticado',
-        component: Autenticado,
-        title: 'Autenticado',
     },
     {
         path: 'listar-formularios',

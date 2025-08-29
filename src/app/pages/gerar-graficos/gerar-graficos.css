@@ -1,51 +1,73 @@
 main {
-    display: flex;
-    flex-direction: column;
-    grid-gap: 1em;
+  display: flex;
+  flex-direction: column;
+  grid-gap: 1em;
 }
 
-.opcoes-graficos{
-    display: flex;
-    flex-direction: column;
-    grid-gap: 0.5em;
+.opcoes-graficos {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 0.5em;
 }
 
-.lista-questoes{
-    display: flex;
-    flex-direction: column;
-    grid-gap: 0.5em;
-    margin-bottom: 0.5em;
+.lista-questoes {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 0.5em;
+  margin-bottom: 0.5em;
 }
 
-.opcoes-questao{
-    display: flex;
-    align-items: center;
-    grid-gap: 0.5em;
+.opcoes-questao {
+  display: flex;
+  align-items: center;
+  grid-gap: 0.5em;
+  text-align: center;
+}
+
+.lista-graficos {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 0.5em;
+}
+
+.lista-graficos h3{
     text-align: center;
 }
 
-.lista-graficos{
-    display: flex;
-    flex-direction: column;
-    grid-gap: 0.5em;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
 }
 
-strong{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 0.5em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: rgba(212, 7, 7, 0.893);
-    color: #fff;
-    width: 40px;
-    height: 40px;
-    margin: 0 auto;
-    border-radius: 50%;
-    cursor: pointer;
+strong i {
+  cursor: pointer;
+  padding: 0.75em;
+  background-color: red;
+  color: #fff;
+  border-radius: 50%;
+}
+
+.corpo-grafico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.corpo-grafico .texto-grafico-left {
+  text-align: right;
+  max-width: 250px;
+  width: 100%;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+.corpo-grafico .texto-grafico-right {
+  text-align: left;
+  max-width: 250px;
+  width: 100%;
+  overflow-wrap: break-word;
+  overflow: hidden;
 }

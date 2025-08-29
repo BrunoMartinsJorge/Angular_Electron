@@ -20,7 +20,10 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { GraficoModel } from '../../shared/models/Grafico.model';
 import { Tooltip } from 'primeng/tooltip';
-import { InputGroup } from "primeng/inputgroup";
+import { InputGroup } from 'primeng/inputgroup';
+import { PanelModule } from 'primeng/panel';
+import { Textarea } from 'primeng/textarea';
+import { Select } from "primeng/select";
 
 @Component({
   selector: 'app-gerar-graficos',
@@ -34,7 +37,9 @@ import { InputGroup } from "primeng/inputgroup";
     RadioButton,
     ChartModule,
     Tooltip,
-    InputGroup
+    PanelModule,
+    Textarea,
+    Select
 ],
   templateUrl: './gerar-graficos.html',
   styleUrl: './gerar-graficos.css',
@@ -43,14 +48,13 @@ export class GerarGraficos implements OnChanges {
   @Input() questoesRespondidas: QuestaoModel[] = [];
   @ViewChild('pdfGraph', { static: false }) pdfGraph!: ElementRef;
   public gerandoPDF: boolean = false;
-
+  public opcoesDoGrafico: string[] = [];
   public questoesFormatadas: any[] = [];
   public readonly listaOpcoesGraficos: any[] = [
     { label: 'Pizza', value: 'pie' },
     { label: 'Rosca', value: 'doughnut' },
     { label: 'Linha', value: 'line' },
     { label: 'Barra', value: 'bar' },
-    { label: 'Radar', value: 'radar' },
     { label: 'Area Polar', value: 'polarArea' },
   ];
   public graficoEscolhido:
@@ -124,6 +128,13 @@ export class GerarGraficos implements OnChanges {
     );
   }
 
+  /**
+   *
+   * @param respostas - Respostas da pergunta já formatadas
+   * @param questao - Titulo da questão
+   * @param tipo - Tipo da questão
+   * @description Função responsavel por criar os gráficos
+   */
   private createGraph(
     respostas: any[],
     questao: string,
@@ -131,6 +142,7 @@ export class GerarGraficos implements OnChanges {
   ): void {
     let labels: string[] = [];
     let data: number[] = [];
+    console.log(respostas);
 
     switch (tipo) {
       case TypeQuestEnum.TEXTO:
@@ -190,6 +202,99 @@ export class GerarGraficos implements OnChanges {
         const contagemBool = this.count(bools);
         labels = Object.keys(contagemBool);
         data = Object.values(contagemBool);
+        break;
+    }
+
+    let option: any;
+
+    switch (this.graficoEscolhido) {
+      case 'bar': // colunas
+      case 'line': // linhas
+        option = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: questao,
+            },
+          },
+          scales: {
+            x: {
+              title: { display: true, text: 'Opções' },
+              ticks: { font: { weight: 500 } },
+              grid: { drawBorder: false },
+            },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Quantidade' },
+              grid: { drawBorder: false },
+            },
+          },
+        };
+        break;
+
+      case 'pie':
+      case 'doughnut':
+        option = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+            },
+            title: {
+              display: true,
+              text: questao,
+            },
+          },
+        };
+        break;
+
+      case 'radar':
+        option = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: questao,
+            },
+          },
+          scales: {
+            r: {
+              beginAtZero: true,
+              angleLines: { display: true },
+              ticks: { stepSize: 1 },
+            },
+          },
+        };
+        break;
+
+      default:
+        option = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: questao,
+            },
+          },
+        };
         break;
     }
 
@@ -253,7 +358,11 @@ export class GerarGraficos implements OnChanges {
           ],
         },
       ],
+      options: option,
+      descricao: '',
+      posicao: 'left',
     };
+    console.log(newGraph);
     setTimeout(() => this.cleanData(), this.graficos.push(newGraph));
   }
 
@@ -262,8 +371,13 @@ export class GerarGraficos implements OnChanges {
     return true;
   }
 
+  public updateGraph(index: number): void {
+    console.log(this.graficos[index]);
+  }
+
   public enableGraphGeneration(): boolean {
-    if (!this.graficoEscolhido || !this.questaoSelecionada.idQuestao) return false;
+    if (!this.graficoEscolhido || !this.questaoSelecionada.idQuestao)
+      return false;
     return true;
   }
   private convertResposes(texto: string): string {
@@ -295,7 +409,7 @@ export class GerarGraficos implements OnChanges {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF();
       pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
-      pdf.save('formulario.pdf');
+      pdf.save('grafico_formularios.pdf');
     });
   }
 
