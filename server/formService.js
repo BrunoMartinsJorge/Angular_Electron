@@ -2,7 +2,6 @@ const db = require("./db");
 const { google } = require("googleapis");
 const { getAuthClient } = require("./googleAuth");
 
-// Salvar formulário completo
 async function salvarFormularioCompleto(dadosForm) {
   const insertFormulario = db.prepare(
     "INSERT INTO Formulario (Titulo, Descricao, Link_Url, formId) VALUES (?, ?, ?, ?)"

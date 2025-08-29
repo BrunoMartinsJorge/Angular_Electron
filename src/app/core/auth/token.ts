@@ -13,4 +13,13 @@ export class Token {
   public getAuthToken(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/auth/google`);
   }
+
+  async isAuthenticated(): Promise<boolean> {
+    try {
+      const res: any = await this.http.get('/validate-token').toPromise();
+      return res.valid;
+    } catch (err) {
+      return false;
+    }
+  }
 }

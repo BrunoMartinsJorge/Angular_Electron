@@ -3,6 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Navbar } from './shared/navbar/navbar';
 import { CommonModule } from '@angular/common';
+import { Token } from './core/auth/token';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,8 @@ export class App {
   protected readonly title = signal('Angular_Electron');
   public navbarAtiva: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+  }
 
   public ativarNavbar(): void {
     this.navbarAtiva = true;

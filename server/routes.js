@@ -36,6 +36,29 @@ router.get("/oauth2callback", async (req, res) => {
   }
 });
 
+router.get("/validate-token", async (req, res) => {
+  try {
+    const row = getStoredTokens();
+    if (!row) return res.status(401).json({ valid: false, message: "Nenhum token encontrado" });
+
+    oAuth2Client.setCredentials({
+      access_token: row.accessToken,
+      refresh_token: row.refreshToken,
+      expiry_date: row.expiryDate,
+    });
+    if (Date.now() > row.expiryDate) {
+      const { credentials } = await oAuth2Client.refreshToken(row.refreshToken);
+      storeTokens(credentials);
+      oAuth2Client.setCredentials(credentials);
+    }
+
+    res.json({ valid: true });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ valid: false, message: "Token inválido" });
+  }
+});
+
 router.post("/api/quiz", async (req, res) => {
   try {
     const resultado = await criarQuiz(req.body);
